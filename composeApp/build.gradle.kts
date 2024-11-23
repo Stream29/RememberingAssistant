@@ -92,6 +92,7 @@ compose.desktop {
         nativeDistributions {
             packageName = "RememberingAssistant"
             packageVersion = "1.0.0"
+            modules("java.instrument", "java.sql", "jdk.unsupported")
             windows {
                 targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             }
