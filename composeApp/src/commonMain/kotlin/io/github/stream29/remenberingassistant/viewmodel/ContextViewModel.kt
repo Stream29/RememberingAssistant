@@ -1,20 +1,36 @@
 package io.github.stream29.remenberingassistant.viewmodel
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import io.github.stream29.langchain4kt.streaming.asStreamChatModel
+import io.github.stream29.remenberingassistant.streamChatApiProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class ContextViewModel : ViewModel() {
-    val stateFlow = MutableStateFlow("")
+    private val model = streamChatApiProvider.asStreamChatModel()
+    val record = mutableStateListOf<String>()
+    val currentStream = mutableStateListOf<String>()
+    private val mutex = Mutex()
+
     fun chat(message: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            stateFlow.value += message + "\n"
-            stateFlow.value += "starting request...\n"
-            delay(1000)
-            stateFlow.value += "request completed\n"
+            record += "User: $message"
+//            runCatching {
+                model.chat(message).collect {
+                    println("received: $it")
+                    mutex.withLock {
+                        currentStream.add(it)
+                    }
+                }
+                record += "Model:${currentStream.joinToString("")}"
+                currentStream.clear()
+//            }.onFailure {
+//                record += "Error: ${it.stackTraceToString()}"
+//            }
         }
     }
 }

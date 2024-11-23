@@ -1,16 +1,12 @@
 package io.github.stream29.remenberingassistant.view
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.stream29.remenberingassistant.viewmodel.ContextViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -19,17 +15,54 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun App() {
     MaterialTheme {
         val contextViewModel = remember { ContextViewModel() }
-        val textRecord by contextViewModel.stateFlow.collectAsState()
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(
-                onClick = {
-                    contextViewModel.chat("Button clicked")
-                    println("on click")
-                }
+        var chatMessage by remember { mutableStateOf("") }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LazyColumn(
+                reverseLayout = true,
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                Text("Click me!")
+                item {
+                    if(contextViewModel.currentStream.isNotEmpty()) {
+                        Text("Model: ${contextViewModel.currentStream.joinToString("")}")
+                        Divider()
+                    }
+                }
+                contextViewModel.record.toList().asReversed().forEach {
+                    item {
+                        Text(it)
+                        Divider()
+                    }
+                }
             }
-            Text(textRecord)
+            Row(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp, max = 80.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                TextField(
+                    value = chatMessage,
+                    modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight(),
+                    onValueChange = {
+                        if (it.contains("\n")) {
+                            contextViewModel.chat(chatMessage)
+                            chatMessage = ""
+                        } else {
+                            chatMessage = it
+                        }
+                    }
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    onClick = {
+                        contextViewModel.chat(chatMessage)
+                        chatMessage = ""
+                    }
+                ) {
+                    Text("Chat")
+                }
+            }
         }
     }
 }

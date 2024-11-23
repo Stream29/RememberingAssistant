@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -17,7 +18,12 @@ kotlin {
         }
     }
     
-    jvm("desktop")
+    jvm("desktop") {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+    }
     
     sourceSets {
         val desktopMain by getting
@@ -28,6 +34,9 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(libs.langchain4kt.core)
+            implementation(libs.langchain4kt.streaming)
+            implementation(libs.langchain4j.dashscope)
+            implementation(libs.langchain4kt.api.langchain4j)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
