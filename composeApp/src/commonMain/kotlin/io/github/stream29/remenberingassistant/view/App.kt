@@ -1,12 +1,17 @@
 package io.github.stream29.remenberingassistant.view
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import io.github.stream29.remenberingassistant.viewmodel.ContextViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -25,7 +30,7 @@ fun App() {
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 item {
-                    if(contextViewModel.currentStream.isNotEmpty()) {
+                    if (contextViewModel.currentStream.isNotEmpty()) {
                         Text("Model: ${contextViewModel.currentStream.joinToString("")}")
                         Divider()
                     }
@@ -38,12 +43,15 @@ fun App() {
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp, max = 80.dp),
+                modifier = Modifier.fillMaxWidth().weight(0.1f),
                 verticalAlignment = Alignment.Bottom
             ) {
                 TextField(
                     value = chatMessage,
-                    modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight(),
+                    modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight().scrollable(
+                        orientation = Orientation.Vertical,
+                        state = rememberScrollState(),
+                    ),
                     onValueChange = {
                         if (it.contains("\n")) {
                             contextViewModel.chat(chatMessage)
