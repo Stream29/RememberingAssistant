@@ -88,7 +88,7 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "io.github.stream29.remenberingassistant.MainKt"
-
+        jvmArgs("-Dfile.encoding=UTF-8")
         nativeDistributions {
             packageName = "RememberingAssistant"
             packageVersion = "1.0.0"

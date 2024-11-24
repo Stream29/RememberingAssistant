@@ -19,18 +19,18 @@ class ContextViewModel : ViewModel() {
     fun chat(message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             record += "User: $message"
-//            runCatching {
+            runCatching {
                 model.chat(message).collect {
                     println("received: $it")
                     mutex.withLock {
                         currentStream.add(it)
                     }
                 }
-                record += "Model:${currentStream.joinToString("")}"
+                record += "Model: ${currentStream.joinToString("")}"
                 currentStream.clear()
-//            }.onFailure {
-//                record += "Error: ${it.stackTraceToString()}"
-//            }
+            }.onFailure {
+                record += "Error: ${it.stackTraceToString()}"
+            }
         }
     }
 }
