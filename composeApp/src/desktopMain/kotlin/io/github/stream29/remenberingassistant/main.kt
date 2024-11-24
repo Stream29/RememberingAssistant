@@ -9,7 +9,7 @@ fun main() = application {
     System.setOut(PrintStream(System.out, false, "UTF-8"))
     Window(
         onCloseRequest = ::exitApplication,
-        title = "CmpPackagingDemo",
+        title = "Remembering Assistant",
     ) {
         App()
     }
