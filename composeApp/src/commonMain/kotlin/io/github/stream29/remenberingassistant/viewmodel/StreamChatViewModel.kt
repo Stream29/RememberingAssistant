@@ -26,18 +26,14 @@ class StreamChatViewModel : ViewModel() {
     fun chat(message: String) {
         CoroutineScope(Dispatchers.IO).launch {
             record += "User: $message"
-            runCatching {
-                model.chat(message).collect {
-                    println("received: $it")
-                    mutex.withLock {
-                        currentStream.add(it)
-                    }
+            model.chat(message).collect {
+                println("received: $it")
+                mutex.withLock {
+                    currentStream.add(it)
                 }
-                record += "Model: ${currentStream.joinToString("")}"
-                currentStream.clear()
-            }.onFailure {
-                record += "Error: ${it.stackTraceToString()}"
             }
+            record += "Model: ${currentStream.joinToString("")}"
+            currentStream.clear()
         }
     }
 }

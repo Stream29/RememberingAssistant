@@ -7,15 +7,12 @@ import androidx.compose.runtime.Composable
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 
 @Composable
-fun HelloPage(applicationContext: ApplicationContext) {
+fun ApplicationContext.HelloPage() {
     MaterialTheme {
         Button(
-            onClick = {
-                applicationContext.navHostController.navigate("StreamChatPage")
-            }
+            onClick = { navHostController.navigate("StreamChatPage") }
         ) {
             Text("Hello! Click to chat.")
         }
-
     }
 }

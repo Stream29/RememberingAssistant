@@ -17,8 +17,17 @@ import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.viewmodel.StreamChatViewModel
 
 @Composable
-fun StreamChatPage(applicationContext: ApplicationContext) = MaterialTheme {
-    val streamChatViewModel = remember { StreamChatViewModel() }
+fun ApplicationContext.SafeStreamChatPage() = MaterialTheme {
+    val streamChatViewModelResult = remember { runCatching { StreamChatViewModel() } }
+    streamChatViewModelResult.onSuccess {
+        StreamChatPage(it)
+    }.onFailure {
+        FailDialog(it.message ?: "Unknown error", Page.HelloPage)
+    }
+}
+
+@Composable
+fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) = MaterialTheme {
     with(streamChatViewModel) {
         Column(
             modifier = Modifier.fillMaxWidth(),

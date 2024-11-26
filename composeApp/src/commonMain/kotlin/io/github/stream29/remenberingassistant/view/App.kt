@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.view.page.HelloPage
 import io.github.stream29.remenberingassistant.view.page.Page
-import io.github.stream29.remenberingassistant.view.page.StreamChatPage
+import io.github.stream29.remenberingassistant.view.page.SafeStreamChatPage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -22,18 +22,20 @@ fun App() {
     val applicationContext = remember {
         ApplicationContext(navHostController = navHostController)
     }
-    NavHost(
-        navController = applicationContext.navHostController,
-        startDestination = Page.HelloPage.toString(),
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        composable(route = Page.HelloPage.toString()) {
-            HelloPage(applicationContext)
-        }
-        composable(route = Page.StreamChatPage.toString()) {
-            StreamChatPage(applicationContext)
+    with(applicationContext) {
+        NavHost(
+            navController = navHostController,
+            startDestination = Page.HelloPage.toString(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            composable(route = Page.HelloPage.toString()) {
+                HelloPage()
+            }
+            composable(route = Page.StreamChatPage.toString()) {
+                SafeStreamChatPage()
+            }
         }
     }
 }
