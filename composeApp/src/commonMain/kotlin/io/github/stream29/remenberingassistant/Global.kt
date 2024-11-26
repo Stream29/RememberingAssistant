@@ -2,8 +2,8 @@ package io.github.stream29.remenberingassistant
 
 import dev.langchain4j.model.dashscope.QwenChatModel
 import dev.langchain4j.model.dashscope.QwenStreamingChatModel
-import io.github.stream29.langchain4kt.api.langchain4kt.Langchain4jChatApiProvider
-import io.github.stream29.langchain4kt.api.langchain4kt.Langchain4jStreamChatApiProvider
+import io.github.stream29.langchain4kt.api.langchain4j.Langchain4jChatApiProvider
+import io.github.stream29.langchain4kt.api.langchain4j.Langchain4jStreamChatApiProvider
 
 val apiKey = "API-KEY"
 
