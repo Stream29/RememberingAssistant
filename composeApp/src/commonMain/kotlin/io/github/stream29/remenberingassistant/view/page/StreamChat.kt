@@ -9,11 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.github.stream29.remenberingassistant.model.ApplicationContext
+import io.github.stream29.remenberingassistant.model.navigate
+import io.github.stream29.remenberingassistant.recursiveMessage
 import io.github.stream29.remenberingassistant.viewmodel.StreamChatViewModel
 
 @Composable
@@ -22,7 +23,7 @@ fun ApplicationContext.SafeStreamChatPage() = MaterialTheme {
     streamChatViewModelResult.onSuccess {
         StreamChatPage(it)
     }.onFailure {
-        FailDialog(it.message ?: "Unknown error", Page.HelloPage)
+        FailDialog(it.recursiveMessage) { navigate(Page.HelloPage) }
     }
 }
 
@@ -33,6 +34,20 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            var onError by remember { mutableStateOf(false) }
+            var errorMessage by remember { mutableStateOf("") }
+            if(onError)
+                FailDialog(errorMessage) { onError = false }
+
+            fun safeChat(input: String) {
+                chat(input).invokeOnCompletion {
+                    it?.let {
+                        onError = true
+                        errorMessage = it.recursiveMessage
+                    }
+                }
+                inputText = ""
+            }
             LazyColumn(
                 reverseLayout = true,
                 modifier = Modifier.fillMaxWidth().weight(1f)
@@ -61,19 +76,16 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
                         state = rememberScrollState(),
                     ),
                     onValueChange = {
-                        if (it.contains("\n")) {
-                            chat(inputText)
-                            inputText = ""
-                        } else {
+                        if (it.contains("\n"))
+                            safeChat(inputText)
+                        else
                             inputText = it
-                        }
                     }
                 )
                 Button(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                     onClick = {
-                        chat(inputText)
-                        inputText = ""
+                        safeChat(inputText)
                     }
                 ) {
                     Text("Chat")

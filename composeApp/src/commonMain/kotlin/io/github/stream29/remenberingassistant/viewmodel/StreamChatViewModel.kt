@@ -23,17 +23,16 @@ class StreamChatViewModel : ViewModel() {
     var inputText by mutableStateOf("")
     private val mutex = Mutex()
 
-    fun chat(message: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            record += "User: $message"
-            model.chat(message).collect {
-                println("received: $it")
-                mutex.withLock {
-                    currentStream.add(it)
-                }
+    fun chat(message: String) = CoroutineScope(Dispatchers.IO).launch {
+        record += "User: $message"
+        model.chat(message).collect {
+            println("received: $it")
+            mutex.withLock {
+                currentStream.add(it)
             }
-            record += "Model: ${currentStream.joinToString("")}"
-            currentStream.clear()
         }
+        record += "Model: ${currentStream.joinToString("")}"
+        currentStream.clear()
     }
+
 }
