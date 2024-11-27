@@ -10,7 +10,7 @@ import io.github.stream29.remenberingassistant.view.App
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _dataDirectory = baseContext.filesDir
+        _dataDirectory = baseContext.getExternalFilesDir(null)!!
         setContent {
             App()
         }

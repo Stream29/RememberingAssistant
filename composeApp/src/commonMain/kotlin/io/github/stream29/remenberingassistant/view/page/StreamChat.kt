@@ -34,20 +34,8 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var onError by remember { mutableStateOf(false) }
-            var errorMessage by remember { mutableStateOf("") }
             if(onError)
                 FailDialog(errorMessage) { onError = false }
-
-            fun safeChat(input: String) {
-                chat(input).invokeOnCompletion {
-                    it?.let {
-                        onError = true
-                        errorMessage = it.recursiveMessage
-                    }
-                }
-                inputText = ""
-            }
             LazyColumn(
                 reverseLayout = true,
                 modifier = Modifier.fillMaxWidth().weight(1f)
@@ -77,7 +65,7 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
                     ),
                     onValueChange = {
                         if (it.contains("\n"))
-                            safeChat(inputText)
+                            chat()
                         else
                             inputText = it
                     }
@@ -85,7 +73,7 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
                 Button(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                     onClick = {
-                        safeChat(inputText)
+                        chat()
                     }
                 ) {
                     Text("Chat")
