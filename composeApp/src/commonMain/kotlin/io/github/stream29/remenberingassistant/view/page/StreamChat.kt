@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.model.navigate
 import io.github.stream29.remenberingassistant.recursiveMessage
+import io.github.stream29.remenberingassistant.view.component.ChatHistoryItem
 import io.github.stream29.remenberingassistant.view.component.FailDialog
 import io.github.stream29.remenberingassistant.view.component.SelectableStatus
 import io.github.stream29.remenberingassistant.viewmodel.StreamChatViewModel
@@ -61,18 +62,8 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
                 reverseLayout = true,
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                item {
-                    if (currentStream.isNotEmpty()) {
-                        Text("Model: ${currentStream.joinToString("")}")
-                        Divider()
-                    }
-                }
-                record.toList().asReversed().forEach {
-                    item {
-                        Text(it)
-                        Divider()
-                    }
-                }
+                currentStream.joinToString("").takeIf { it.isNotEmpty() }?.let { ChatHistoryItem(it) }
+                record.toList().asReversed().forEach { ChatHistoryItem(it) }
             }
             Row(
                 modifier = Modifier.fillMaxWidth().weight(0.2f),

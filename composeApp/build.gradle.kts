@@ -38,6 +38,8 @@ kotlin {
             implementation(libs.langchain4j.dashscope)
             implementation(libs.langchain4kt.api.langchain4j)
             implementation(libs.kaml)
+            implementation(libs.markdown.renderer.cmp)
+            implementation(libs.markdown.renderer.cmp.m2)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
