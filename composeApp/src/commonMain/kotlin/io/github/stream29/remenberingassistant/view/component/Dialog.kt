@@ -1,4 +1,4 @@
-package io.github.stream29.remenberingassistant.view.page
+package io.github.stream29.remenberingassistant.view.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

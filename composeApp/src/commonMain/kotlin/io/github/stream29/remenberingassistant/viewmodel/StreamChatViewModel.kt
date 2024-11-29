@@ -1,12 +1,18 @@
 package io.github.stream29.remenberingassistant.viewmodel
 
+import androidx.compose.material.DropdownMenuState
+import androidx.compose.material.DropdownMenuState.Status
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
-import io.github.stream29.langchain4kt.streaming.asStreamChatModel
-import io.github.stream29.remenberingassistant.apiProviders
+import io.github.stream29.langchain4kt.core.input.Context
+import io.github.stream29.langchain4kt.streaming.SimpleStreamChatModel
+import io.github.stream29.langchain4kt.streaming.StreamChatApiProvider
+import io.github.stream29.langchain4kt.streaming.StreamChatModel
+import io.github.stream29.remenberingassistant.Global
 import io.github.stream29.remenberingassistant.recursiveMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,38 +20,58 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class StreamChatViewModel : ViewModel() {
-    private val model =
-        apiProviders.firstNotNullOfOrNull { it.value.streamChatApiProvider }
-            ?.asStreamChatModel()
+class StreamChatViewModel(
+    val context: Context = Context()
+) : ViewModel() {
+    val apiProviders
+        get() = Global.apiProviders
+    var currentApiProvider =
+        apiProviders.firstNotNullOfOrNull { it.key to it.value.streamChatApiProvider }
             ?: throw IllegalStateException("No api auth available")
+        set(value) {
+            field = value
+            currentApiProviderName = value.first
+            if (currentModelLock.isLocked)
+                currentModel = SimpleStreamChatModel(value.second, context)
+            else
+                nextApiProvider = value.second
+        }
+    private var currentModel: StreamChatModel = SimpleStreamChatModel(currentApiProvider.second, context)
+    var currentApiProviderName by mutableStateOf(currentApiProvider.first)
     val record = mutableStateListOf<String>()
+    var dropdownExpandedState = mutableStateOf(false)
     val currentStream = mutableStateListOf<String>()
     var inputText by mutableStateOf("")
     var onError by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
-    private val mutex = Mutex()
+
+    @Volatile
+    private var nextApiProvider: StreamChatApiProvider<*>? = null
+    private val currentModelLock = Mutex()
+    private val currentStreamLock = Mutex()
 
     fun chat() = CoroutineScope(Dispatchers.IO).launch {
-        val historyBackup = record.size
-        val message = inputText
-        inputText = ""
-        runCatching {
-            record += "User: $message"
-            model.chat(message).collect {
-                println("received: $it")
-                mutex.withLock {
-                    currentStream.add(it)
+        currentModelLock.withLock {
+            val message = inputText
+            inputText = ""
+            runCatching {
+                record += "User: $message"
+                currentModel.chat(message).collect {
+                    println("received: $it")
+                    currentStreamLock.withLock {
+                        currentStream.add(it)
+                    }
                 }
+                record += "Model: ${currentStream.joinToString("")}"
+                currentStream.clear()
+            }.onFailure {
+                onError = true
+                errorMessage = it.recursiveMessage
+                currentStream.clear()
             }
-            record += "Model: ${currentStream.joinToString("")}"
-            currentStream.clear()
-        }.onFailure {
-            onError = true
-            errorMessage = it.recursiveMessage
-            currentStream.clear()
-            while(record.size > historyBackup) {
-                record.removeAt(record.size - 1)
+            nextApiProvider?.let {
+                nextApiProvider = null
+                currentModel = SimpleStreamChatModel(it, context)
             }
         }
     }

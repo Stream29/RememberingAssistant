@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.model.navigate
 import io.github.stream29.remenberingassistant.recursiveMessage
+import io.github.stream29.remenberingassistant.view.component.FailDialog
+import io.github.stream29.remenberingassistant.view.component.SelectableStatus
 import io.github.stream29.remenberingassistant.viewmodel.StreamChatViewModel
 
 @Composable
@@ -37,10 +39,23 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
         ) {
             if (onError)
                 FailDialog(errorMessage) { onError = false }
-            TopAppBar(
-                modifier = Modifier.fillMaxWidth().weight(0.1f),
-            ) {
-                Text("Stream Chat")
+            TopAppBar(modifier = Modifier.fillMaxWidth().weight(0.1f)) {
+                Text(text = "Stream Chat", modifier = Modifier.weight(1f))
+                SelectableStatus(
+                    expandedState = dropdownExpandedState,
+                    selected = { Text("Using API: $currentApiProviderName") },
+                ) {
+                    apiProviders.forEach { (name, auth) ->
+                        DropdownMenuItem(
+                            onClick = {
+                                currentApiProvider = name to auth.streamChatApiProvider
+                                dropdownExpandedState.value = false
+                            }
+                        ) {
+                            Text(name)
+                        }
+                    }
+                }
             }
             LazyColumn(
                 reverseLayout = true,
