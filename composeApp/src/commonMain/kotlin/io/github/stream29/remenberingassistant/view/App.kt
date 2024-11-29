@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.stream29.remenberingassistant.model.ApplicationContext
+import io.github.stream29.remenberingassistant.view.page.FileEditPage
 import io.github.stream29.remenberingassistant.view.page.HelloPage
 import io.github.stream29.remenberingassistant.view.page.Page
 import io.github.stream29.remenberingassistant.view.page.SafeStreamChatPage
@@ -35,6 +36,9 @@ fun App() {
             }
             composable(route = Page.StreamChatPage.toString()) {
                 SafeStreamChatPage()
+            }
+            composable(route = Page.FileEditPage.toString()) {
+                FileEditPage()
             }
         }
     }

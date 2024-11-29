@@ -11,14 +11,18 @@ val Throwable.recursiveMessage: String
         }
     }
 
-data class ReloadableProperty<T>(val load: () -> T) {
-    private var value: T = load()
+data class ReloadablePropertyBase<T>(
+    val load: () -> T
+) {
+    private var _value: T = load()
+    val value: T
+        get() = _value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     fun reload() {
-        value = load()
+        _value = load()
     }
 }
 
-fun <T> reloadable(block: () -> T) = ReloadableProperty(block)
+fun <T> reloadable(block: () -> T) = ReloadablePropertyBase(block)

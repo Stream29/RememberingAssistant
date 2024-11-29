@@ -17,7 +17,7 @@ object Global {
     )
 
     val apiProvidersProperty = reloadable {
-        dataDirectory.resolve("ApiAuth.yml").also { if (!it.exists()) it.createNewFile() }.readText().ifEmpty { "{}" }
+        apiAuthConfigFile.also { if (!it.exists()) it.createNewFile() }.readText().ifEmpty { "{}" }
             .let {
                 runCatching { yaml.decodeFromString<Map<String, ApiAuth>>(it) }.getOrDefault(emptyMap())
             }

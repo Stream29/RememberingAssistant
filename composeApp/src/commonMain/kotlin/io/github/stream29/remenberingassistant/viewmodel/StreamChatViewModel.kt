@@ -1,12 +1,9 @@
 package io.github.stream29.remenberingassistant.viewmodel
 
-import androidx.compose.material.DropdownMenuState
-import androidx.compose.material.DropdownMenuState.Status
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import io.github.stream29.langchain4kt.core.input.Context
 import io.github.stream29.langchain4kt.streaming.SimpleStreamChatModel
@@ -23,6 +20,9 @@ import kotlinx.coroutines.sync.withLock
 class StreamChatViewModel(
     val context: Context = Context()
 ) : ViewModel() {
+    init{
+        println("StreamChatViewModel init")
+    }
     val apiProviders
         get() = Global.apiProviders
     var currentApiProvider =
