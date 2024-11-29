@@ -38,8 +38,8 @@ data class AutoSavableFileDelegate(val file: File) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): String = value
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
         this.value = value
-        println("saved: $value")
         file.writeText(value)
+        println("$file Saved with content: $value")
     }
 
     fun reload() {

@@ -23,8 +23,6 @@ class FileEditViewModel(
     fun save() {
         CoroutineScope(Dispatchers.IO).launch {
             fileContent = content
-            fileDelegate.reload()
-            println("${fileDelegate.file} Saved with content: $content")
         }
     }
 }

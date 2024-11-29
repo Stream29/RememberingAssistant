@@ -27,10 +27,10 @@ class StreamChatViewModel : ViewModel() {
         get() = Global.apiProviders
     var currentNamedApiAuth =
         apiProviders.asSequence()
-            .firstOrNull { (name, auth) -> name == Global.apiAuthText }
+            .firstOrNull { (name, auth) -> name == Global.currentApiAuth }
             ?.let { it.key to it.value }
             ?: apiProviders.firstNotNullOfOrNull { it.key to it.value }
-            ?: throw IllegalStateException("No api auth available")
+            ?: throw IllegalStateException("No api auth available, please add at least one")
         set(value) {
             field = value
             currentApiAuthName = value.first
@@ -73,7 +73,6 @@ class StreamChatViewModel : ViewModel() {
             runCatching {
                 record += "User" to message
                 currentStreamRespondent.chat(responsePrompt(Global.memoryText, message)).collect {
-                    println("received: $it")
                     currentStreamLock.withLock {
                         currentStream += it
                     }
