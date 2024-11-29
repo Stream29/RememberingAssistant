@@ -3,7 +3,7 @@ package io.github.stream29.remenberingassistant
 import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
-import io.github.stream29.remenberingassistant.persistence.ApiAuth
+import io.github.stream29.remenberingassistant.model.ApiAuth
 import kotlinx.serialization.decodeFromString
 
 object Global {

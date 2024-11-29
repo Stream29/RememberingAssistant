@@ -1,4 +1,4 @@
-package io.github.stream29.remenberingassistant.persistence
+package io.github.stream29.remenberingassistant.model
 
 import dev.langchain4j.model.dashscope.QwenChatModel
 import dev.langchain4j.model.dashscope.QwenStreamingChatModel
