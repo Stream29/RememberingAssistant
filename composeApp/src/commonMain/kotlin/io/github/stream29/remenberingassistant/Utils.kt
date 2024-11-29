@@ -1,5 +1,6 @@
 package io.github.stream29.remenberingassistant
 
+import java.io.File
 import kotlin.reflect.KProperty
 
 val Throwable.recursiveMessage: String
@@ -26,3 +27,22 @@ data class ReloadablePropertyBase<T>(
 }
 
 fun <T> reloadable(block: () -> T) = ReloadablePropertyBase(block)
+
+data class AutoSavableFileDelegate(val file: File) {
+    init {
+        if (!file.exists())
+            file.createNewFile()
+    }
+
+    private var value: String = file.readText()
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): String = value
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+        this.value = value
+        println("saved: $value")
+        file.writeText(value)
+    }
+
+    fun reload() {
+        value = file.readText()
+    }
+}

@@ -34,7 +34,7 @@ fun ApplicationContext.SafeStreamChatPage(): Unit = MaterialTheme {
             SafeStreamChatPage()
             reloaded = false
         } else {
-            FailDialog(it.recursiveMessage) { navigate(Page.FileEditPage) }
+            FailDialog(it.recursiveMessage) { navigate(Page.ApiConfigEditPage) }
         }
     }
 }
@@ -52,12 +52,12 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             Text(text = "Stream Chat", modifier = Modifier.weight(1f))
             SelectableStatus(
                 expandedState = dropdownExpandedState,
-                selected = { Text("Using API: $currentApiProviderName") },
+                selected = { Text("Using API: $currentApiAuthName") },
             ) {
                 apiProviders.forEach { (name, auth) ->
                     DropdownMenuItem(
                         onClick = {
-                            currentApiProvider = name to auth.streamChatApiProvider
+                            currentNamedApiAuth = name to auth
                             dropdownExpandedState.value = false
                         }
                     ) {
@@ -70,8 +70,8 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             reverseLayout = true,
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
-            currentStream.takeIf { it.isNotEmpty() }?.let { ChatHistoryItem(it) }
-            record.toList().asReversed().forEach { ChatHistoryItem(it) }
+            currentStream.takeIf { it.isNotEmpty() }?.let { ChatHistoryItem("Model", it) }
+            record.toList().asReversed().forEach { ChatHistoryItem(it.first, it.second) }
         }
         Row(
             modifier = Modifier.fillMaxWidth().weight(0.2f),

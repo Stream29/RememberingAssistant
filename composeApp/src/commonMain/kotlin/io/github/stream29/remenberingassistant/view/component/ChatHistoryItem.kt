@@ -6,11 +6,13 @@ import androidx.compose.material.Text
 import com.mikepenz.markdown.m2.Markdown
 
 fun LazyListScope.ChatHistoryItem(
+    sender: String,
     content: String
 ) = item {
     if (content.contains("\n"))
         Markdown(content)
     else
         Text(content)
+    Text("$sender: ")
     Divider()
 }

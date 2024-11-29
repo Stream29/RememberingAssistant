@@ -24,4 +24,11 @@ object Global {
     }
 
     val apiProviders by apiProvidersProperty
+
+    var currentApiAuth by AutoSavableFileDelegate(currentApiAuthFile)
+
+    val apiAuthDelegate = AutoSavableFileDelegate(apiAuthConfigFile)
+    var apiAuthText by apiAuthDelegate
+    val memoryDelegate = AutoSavableFileDelegate(memoryFile)
+    var memoryText by memoryDelegate
 }
