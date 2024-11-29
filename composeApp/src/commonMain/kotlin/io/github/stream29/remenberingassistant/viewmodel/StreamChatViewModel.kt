@@ -20,9 +20,10 @@ import kotlinx.coroutines.sync.withLock
 class StreamChatViewModel(
     val context: Context = Context()
 ) : ViewModel() {
-    init{
+    init {
         println("StreamChatViewModel init")
     }
+
     val apiProviders
         get() = Global.apiProviders
     var currentApiProvider =
@@ -31,16 +32,18 @@ class StreamChatViewModel(
         set(value) {
             field = value
             currentApiProviderName = value.first
-            if (currentModelLock.isLocked)
-                currentModel = SimpleStreamChatModel(value.second, context)
-            else
+            if (currentModelLock.isLocked) {
                 nextApiProvider = value.second
+            } else {
+                currentModel = SimpleStreamChatModel(value.second, context)
+                println("api changed")
+            }
         }
     private var currentModel: StreamChatModel = SimpleStreamChatModel(currentApiProvider.second, context)
     var currentApiProviderName by mutableStateOf(currentApiProvider.first)
     val record = mutableStateListOf<String>()
     var dropdownExpandedState = mutableStateOf(false)
-    val currentStream = mutableStateListOf<String>()
+    var currentStream by mutableStateOf<String>("")
     var inputText by mutableStateOf("")
     var onError by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
@@ -55,23 +58,25 @@ class StreamChatViewModel(
             val message = inputText
             inputText = ""
             runCatching {
-                record += "User: $message"
+                record += "User: \n$message"
+                currentStream += "Model: \n"
                 currentModel.chat(message).collect {
                     println("received: $it")
                     currentStreamLock.withLock {
-                        currentStream.add(it)
+                        currentStream += it
                     }
                 }
-                record += "Model: ${currentStream.joinToString("")}"
-                currentStream.clear()
+                record += currentStream
+                currentStream = ""
             }.onFailure {
                 onError = true
                 errorMessage = it.recursiveMessage
-                currentStream.clear()
+                currentStream = ""
             }
             nextApiProvider?.let {
                 nextApiProvider = null
                 currentModel = SimpleStreamChatModel(it, context)
+                println("api changed")
             }
         }
     }

@@ -70,7 +70,7 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             reverseLayout = true,
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
-            currentStream.joinToString("").takeIf { it.isNotEmpty() }?.let { ChatHistoryItem(it) }
+            currentStream.takeIf { it.isNotEmpty() }?.let { ChatHistoryItem(it) }
             record.toList().asReversed().forEach { ChatHistoryItem(it) }
         }
         Row(
