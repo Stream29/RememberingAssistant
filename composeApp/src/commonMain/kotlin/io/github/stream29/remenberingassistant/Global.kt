@@ -20,16 +20,15 @@ object Global {
     @Volatile
     var reload = Instant.now()!!
 
+    var currentApiAuth by AutoSavableFileDelegate(currentApiAuthFile)
+    val apiAuthDelegate = AutoSavableFileDelegate(apiAuthConfigFile)
+    var apiAuthText by apiAuthDelegate
+    val memoryDelegate = AutoSavableFileDelegate(memoryFile)
+    var memoryText by memoryDelegate
+
     val apiProviders by AutoReloadableDelegate {
         Global.runCatching {
             yaml.decodeFromString<Map<String, ApiAuth>>(apiAuthText)
         }.getOrDefault(emptyMap())
     }
-
-    var currentApiAuth by AutoSavableFileDelegate(currentApiAuthFile)
-
-    val apiAuthDelegate = AutoSavableFileDelegate(apiAuthConfigFile)
-    var apiAuthText by apiAuthDelegate
-    val memoryDelegate = AutoSavableFileDelegate(memoryFile)
-    var memoryText by memoryDelegate
 }

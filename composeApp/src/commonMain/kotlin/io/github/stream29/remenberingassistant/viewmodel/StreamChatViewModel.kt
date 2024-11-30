@@ -65,8 +65,10 @@ class StreamChatViewModel : ViewModel() {
     private val memoryLock = Mutex()
 
     fun chat() = CoroutineScope(Dispatchers.IO).launch {
-        memoryLock.withLock {}
         currentModelLock.withLock {
+            memoryLock.withLock {
+                println("get memory lock")
+            }
             val message = inputText
             inputText = ""
             runCatching {
@@ -82,6 +84,7 @@ class StreamChatViewModel : ViewModel() {
                         val memoryPrompt1 = memoryPrompt(Global.memoryText, message, modelMessage)
                         println("memoryPrompt1: $memoryPrompt1")
                         Global.memoryText = currentRespondent.chat(memoryPrompt1)
+                        println("release memory lock")
                     }
                 }
                 record += "Model" to currentStream
