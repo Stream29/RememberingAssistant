@@ -12,6 +12,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.onKeyEvent
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.model.back
 import io.github.stream29.remenberingassistant.model.navigate
@@ -27,15 +29,9 @@ fun ApplicationContext.SafeStreamChatPage(): Unit = MaterialTheme {
     streamChatViewModelResult.onSuccess {
         StreamChatPage(it)
     }.onFailure {
-        if (reloaded) {
-            println("reloaded = $reloaded")
-            streamChatViewModelResult = runCatching { StreamChatViewModel() }
-            println("streamChatViewModelResult = $streamChatViewModelResult")
-            SafeStreamChatPage()
-            reloaded = false
-        } else {
-            FailDialog(it.recursiveMessage) { navigate(Page.ApiConfigEditPage) }
-        }
+        streamChatViewModelResult = runCatching { StreamChatViewModel() }.onSuccess {
+            StreamChatPage(it)
+        }.onFailure { FailDialog(it.recursiveMessage) { navigate(Page.ApiConfigEditPage) } }
     }
 }
 

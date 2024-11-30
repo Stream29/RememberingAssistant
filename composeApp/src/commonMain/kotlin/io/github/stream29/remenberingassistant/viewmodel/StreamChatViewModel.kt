@@ -23,8 +23,7 @@ class StreamChatViewModel : ViewModel() {
         println("StreamChatViewModel init")
     }
 
-    val apiProviders
-        get() = Global.apiProviders
+    val apiProviders by Global::apiProviders
     var currentNamedApiAuth =
         apiProviders.asSequence()
             .firstOrNull { (name, auth) -> name == Global.currentApiAuth }

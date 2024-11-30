@@ -27,7 +27,6 @@ fun ApplicationContext.FileEditPage(fileDelegate: AutoSavableFileDelegate) = Mat
                 Button(
                     onClick = {
                         save()
-                        reloaded = true
                         navigate(Page.HelloPage)
                     }
                 ) { Text("Save") }

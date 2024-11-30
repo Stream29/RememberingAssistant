@@ -1,6 +1,10 @@
 package io.github.stream29.remenberingassistant
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
+import java.time.Instant
 import kotlin.reflect.KProperty
 
 val Throwable.recursiveMessage: String
@@ -12,23 +16,32 @@ val Throwable.recursiveMessage: String
         }
     }
 
-data class ReloadablePropertyBase<T>(
+data class AutoReloadableDelegate<T>(
     val load: () -> T
 ) {
+    @Volatile
+    private var timeStamp = Global.reload
+
     private var _value: T = load()
     val value: T
         get() = _value
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        if (timeStamp != Global.reload) {
+            reload()
+            timeStamp = Global.reload
+        }
+        return value
+    }
 
     fun reload() {
         _value = load()
     }
 }
 
-fun <T> reloadable(block: () -> T) = ReloadablePropertyBase(block)
-
-data class AutoSavableFileDelegate(val file: File) {
+data class AutoSavableFileDelegate(
+    val file: File
+) {
     init {
         if (!file.exists())
             file.createNewFile()
@@ -36,10 +49,13 @@ data class AutoSavableFileDelegate(val file: File) {
 
     private var value: String = file.readText()
     operator fun getValue(thisRef: Any?, property: KProperty<*>): String = value
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-        this.value = value
-        file.writeText(value)
-        println("$file Saved with content: $value")
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: String) {
+        value = newValue
+        CoroutineScope(Dispatchers.IO).launch {
+            file.writeText(newValue)
+            Global.reload = Instant.now()
+            println("$file Saved with content: $newValue")
+        }
     }
 
     fun reload() {

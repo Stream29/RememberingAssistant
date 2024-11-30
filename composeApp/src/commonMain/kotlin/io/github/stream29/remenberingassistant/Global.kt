@@ -5,6 +5,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import io.github.stream29.remenberingassistant.model.ApiAuth
 import kotlinx.serialization.decodeFromString
+import java.time.Instant
 
 object Global {
     val yaml = Yaml(
@@ -16,14 +17,14 @@ object Global {
         )
     )
 
-    val apiProvidersProperty = reloadable {
-        apiAuthConfigFile.also { if (!it.exists()) it.createNewFile() }.readText().ifEmpty { "{}" }
-            .let {
-                runCatching { yaml.decodeFromString<Map<String, ApiAuth>>(it) }.getOrDefault(emptyMap())
-            }
-    }
+    @Volatile
+    var reload = Instant.now()!!
 
-    val apiProviders by apiProvidersProperty
+    val apiProviders by AutoReloadableDelegate {
+        Global.runCatching {
+            yaml.decodeFromString<Map<String, ApiAuth>>(apiAuthText)
+        }.getOrDefault(emptyMap())
+    }
 
     var currentApiAuth by AutoSavableFileDelegate(currentApiAuthFile)
 
