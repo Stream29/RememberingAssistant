@@ -12,8 +12,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.onKeyEvent
 import io.github.stream29.remenberingassistant.model.ApplicationContext
 import io.github.stream29.remenberingassistant.model.back
 import io.github.stream29.remenberingassistant.model.navigate
@@ -67,7 +65,7 @@ fun ApplicationContext.StreamChatPage(streamChatViewModel: StreamChatViewModel) 
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
             currentStream.takeIf { it.isNotEmpty() }?.let { ChatHistoryItem("Model", it) }
-            record.toList().asReversed().forEach { ChatHistoryItem(it.first, it.second) }
+            history.toList().asReversed().forEach { ChatHistoryItem(it.sender.toString(), it.content) }
         }
         Row(
             modifier = Modifier.fillMaxWidth().weight(0.2f),
